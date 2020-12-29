@@ -1,3 +1,3 @@
-# SmartThings-beta
+# Spruce-SmartThings-beta
 
 beta device, smartapps for SmartThings

@@ -1,0 +1,151 @@
+{
+    "dashboard": {
+        "states": [
+            {
+                "label": "{{controllerState.value}}",
+                "displayType": "switch",
+                "switch": {
+                    "command": {
+                        "name": "setControllerState",
+                        "on": "on",
+                        "off": "off"
+                    },
+                    "state": {
+                        "value": "controllerState.value",
+                        "on": "on",
+                        "off": "off"
+                    }
+                }
+            }
+        ],
+        "actions": [
+            {
+                "displayType": "switch",
+                "switch": {
+                    "command": {
+                        "name": "setControllerState",
+                        "on": "on",
+                        "off": "off"
+                    },
+                    "state": {
+                        "value": "controllerState.value",
+                        "on": "on",
+                        "off": "off"
+                    }
+                }
+            }
+        ],
+        "basicPlus": []
+    },
+    "detailView": [
+        {
+            "label": "Controller State",
+            "displayType": "list",
+            "list": {
+                "command": {
+                    "name": "setControllerState",
+                    "alternatives": [
+                        {
+                            "key": "on",
+                            "value": "on"
+                        },
+                        {
+                            "key": "pause",
+                            "value": "pause"
+						},
+						{
+                            "key": "resume",
+                            "value": "resume"
+                        },
+                        {
+                            "key": "off",
+                            "value": "off"
+                        }
+                    ]
+                },            
+                "state": {
+                    "label": "{{controllerState.value}}",
+                    "value": "controllerState.value",
+                    "alternatives": [
+                        {
+                            "key": "on",
+                            "value": "on"
+                        },
+                        {
+                            "key": "pause",
+                            "value": "pause"
+						},
+						{
+                            "key": "resume",
+                            "value": "resume"
+                        },
+                        {
+                            "key": "off",
+                            "value": "off"
+                        }
+                    ]
+                }
+			}
+        }
+    ],
+    "automation": {
+        "conditions": [
+			{
+                "label": "Controller State",
+                "displayType": "list",
+                "list": {
+                    "label": "Controller State",
+                    "value": "controllerState.value",
+                    "alternatives": [
+                        {
+                            "key": "on",
+                            "value": "on"
+                        },
+                        {
+                            "key": "pause",
+                            "value": "pause"
+						},
+						{
+                            "key": "resume",
+                            "value": "resume"
+                        },
+                        {
+                            "key": "off",
+                            "value": "off"
+                        }
+                    ]
+                }
+            }
+		],
+        "actions": [
+            {
+                "label": "Controller State",
+                "displayType": "list",
+                "list": {
+                    "label": "Controller State",
+                    "command": "setControllerState",
+                    "alternatives": [
+                        {
+                            "key": "on",
+                            "value": "on"
+                        },
+                        {
+                            "key": "pause",
+                            "value": "pause"
+						},
+						{
+                            "key": "resume",
+                            "value": "resume"
+                        },
+                        {
+                            "key": "off",
+                            "value": "off"
+                        }
+                    ]
+                }
+            }
+		]
+    },
+    "id": "heartreturn55003.controllerState",
+    "version": 1
+}

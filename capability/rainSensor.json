@@ -1,0 +1,36 @@
+{
+    "dashboard": {
+        "states": [
+            {
+                "label": "{{rainSensor.value}}"
+            }
+        ],
+        "actions": [],
+        "basicPlus": []
+    },
+    "detailView": [
+        {
+            "label": "Rain Sensor",
+            "displayType": "state",
+            "state": {
+				"label": "{{rainSensor.value}}",
+				"alternatives": [
+					{
+						"key": "rainsensoron",
+						"value": "wet"
+					},
+					{
+						"key": "rainsensoroff",						
+						"value": "dry"
+					}
+				]
+            }
+        }
+    ],
+    "automation": {
+        "conditions": [],
+        "actions": []
+    },
+    "id": "heartreturn55003.rainSensor",
+    "version": 1
+}

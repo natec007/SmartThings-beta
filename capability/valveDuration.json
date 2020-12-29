@@ -1,0 +1,61 @@
+{
+    "dashboard": {
+        "states": [
+            {
+                "label": "{{valveDuration.value}} {{valveDuration.unit}}"
+            }
+        ],
+        "actions": [],
+        "basicPlus": []
+    },
+    "detailView": [
+        {
+            "label": "Valve Duration",
+            "displayType": "slider",
+            "slider": {
+                "range": [
+                    1,
+                    100
+                ],
+                "step": 1,                
+                "unit": "valveDuration.unit",
+                "command": "setValveDuration",
+                "value": "valveDuration.value"
+            }
+        }
+    ],
+    "automation": {
+        "conditions": [
+            {
+                "label": "Valve Duration",
+                "displayType": "slider",
+                "slider": {
+                    "range": [
+                        1,
+                        100
+                    ],
+                    "step": 1,                
+                    "unit": "valveDuration.unit",
+                    "value": "valveDuration.value"
+                }
+            }
+        ],
+        "actions": [
+            {
+                "label": "Valve Duration",
+                "displayType": "slider",
+                "slider": {
+                    "range": [
+                        1,
+                        100
+                    ],
+                    "step": 1,                
+                    "unit": "valveDuration.unit",
+                    "command": "setValveDuration"
+                }
+            }
+        ]
+    },
+    "id": "heartreturn55003.valveDuration",
+    "version": 1
+}

@@ -55,7 +55,7 @@ def getPRESENT_VALUE_IDENTIFIER() {0x0055}
 
 metadata {
 	definition (name: "Spruce Controller SinglePresentation", namespace: "plaidsystems", author: "Plaid Systems", mnmn: "SmartThingsCommunity",
-    	ocfDeviceType: "x.com.st.d.remotecontroller", mcdSync: true, vid: "d80ec602-e64c-39d1-b19b-c26e47ca602b") {
+    	ocfDeviceType: "x.com.st.d.remotecontroller", mcdSync: true, vid: "292b4067-e1d7-3460-a36d-2ddd8ab03079") {
 		
         capability "Actuator"
 		capability "Switch"
@@ -212,30 +212,17 @@ def createChildDevices() {
 	//create, rename, or remove child
 	for (i in 1..16){
 		//endpoint is offset, zone number +1
-		def endpoint = i + 1
+		def endpoint = i + 1		
 		
-		//if(settings."z${i}"){
-			def child = childDevices.find{it.deviceNetworkId == "${device.deviceNetworkId}:${endpoint}"}
-			//create child
-			if (!child){
-				def childLabel = "Zone$i"//(state.oldLabel != null ? "${state.oldLabel} Zone${i}" : "Spruce Zone${i}")
-				if (pumpMasterZone == i) childLabel = "Spruce PM Zone${i}"
-				child = addChildDevice("Spruce Valve Comp", "${device.deviceNetworkId}:${endpoint}", device.hubId,
-						[completedSetup: true, label: "${childLabel}", isComponent: true, componentName: "Zone$i", componentLabel: "Zone$i"])
-                log.debug "${child}"
-                child.sendEvent(name: "valve", value: "closed", displayed: false)
-			}/*
-			//or rename child
-			else if (device.label != state.oldLabel){
-				def childLabel = (state.oldLabel != null ? "${state.oldLabel} Zone${i}" : "Spruce Zone${i}")
-				if (pumpMasterZone == i) childLabel = "Spruce PM Zone${i}"
-				child.setLabel("${childLabel}")
-			}
+		def child = childDevices.find{it.deviceNetworkId == "${device.deviceNetworkId}:${endpoint}"}
+		//create child
+		if (!child){
+			def childLabel = "Zone$i"
+			child = addChildDevice("Spruce Valve Comp", "${device.deviceNetworkId}:${endpoint}", device.hubId,
+					[completedSetup: true, label: "${childLabel}", isComponent: true, componentName: "Zone$i", componentLabel: "Zone$i"])
+			log.debug "${child}"
+			child.sendEvent(name: "valve", value: "closed", displayed: false)
 		}
-		//remove child
-		else if (childDevices.find{it.deviceNetworkId == "${device.deviceNetworkId}:${endpoint}"}){
-			deleteChildDevice("${device.deviceNetworkId}:${endpoint}")
-		}*/
 
 	}
 

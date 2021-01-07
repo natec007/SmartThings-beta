@@ -218,7 +218,7 @@ def createChildDevices() {
 		//create child
 		if (!child){
 			def childLabel = "Zone$i"
-			child = addChildDevice("Spruce Valve Comp", "${device.deviceNetworkId}:${endpoint}", device.hubId,
+			child = addChildDevice("Spruce Valve", "${device.deviceNetworkId}:${endpoint}", device.hubId,
 					[completedSetup: true, label: "${childLabel}", isComponent: true, componentName: "Zone$i", componentLabel: "Zone$i"])
 			log.debug "${child}"
 			child.sendEvent(name: "valve", value: "closed", displayed: false)

@@ -199,13 +199,16 @@
         }
     ],
     "automation": {
-        "conditions": [
+        "conditions": [            
             {
                 "component": "main",
-                "capability": "switch",
+                "capability": "heartreturn55003.controllerState",
+                "label": "Controller State",
                 "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "displayType": "list",
+                "list": {
+                    "value": "controllerState"
+                }
             },
             {
                 "component": "main",
@@ -333,10 +336,32 @@
         "actions": [
             {
                 "component": "main",
-                "capability": "switch",
+                "capability": "heartreturn55003.controllerState",
+                "label": "Controller State",
                 "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "displayType": "list",                
+                "list": {
+                    "label": "Controller State",
+                    "value": "controllerState.value",
+                    "alternatives": [
+                        {
+                            "key": "on",
+                            "value": "on"
+                        },
+                        {
+                            "key": "pause",
+                            "value": "pause"
+						},
+						{
+                            "key": "resume",
+                            "value": "resume"
+                        },
+                        {
+                            "key": "off",
+                            "value": "off"
+                        }
+                    ]
+                }
             },
             {
                 "component": "main",

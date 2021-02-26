@@ -55,7 +55,7 @@ def getPRESENT_VALUE_IDENTIFIER() {0x0055}
 
 metadata {
 	definition (name: "Spruce Controller", namespace: "plaidsystems", author: "Plaid Systems", mnmn: "SmartThingsCommunity",
-    	ocfDeviceType: "x.com.st.d.remotecontroller", mcdSync: true, vid: "8c2cf132-1817-30a4-bab8-47d193221eea") {
+    	ocfDeviceType: "x.com.st.d.remotecontroller", mcdSync: true, vid: "eece9fb9-b73e-30a2-83be-aade6b54a81c") {
 		
         capability "Actuator"
 		capability "Switch"

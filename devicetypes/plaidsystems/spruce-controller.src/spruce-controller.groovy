@@ -55,7 +55,7 @@ def getPRESENT_VALUE_IDENTIFIER() {0x0055}
 
 metadata {
 	definition (name: "Spruce Controller", namespace: "plaidsystems", author: "Plaid Systems", mnmn: "SmartThingsCommunity",
-    	ocfDeviceType: "x.com.st.d.remotecontroller", mcdSync: true, vid: "eece9fb9-b73e-30a2-83be-aade6b54a81c") {
+    	ocfDeviceType: "x.com.st.d.remotecontroller", mcdSync: true, vid: "fc74e230-50c6-349d-95a7-78c9cac035b5") {
 		
         capability "Actuator"
 		capability "Switch"
@@ -190,6 +190,11 @@ def installed() {
     createChildDevices()
 }
 
+def uninstalled() {
+	log.debug "uninstalled"
+	removeChildDevices()
+}
+
 def updated() {
 	log.debug "updated"
 	initialize()
@@ -205,7 +210,7 @@ def initialize() {
 	response(setDeviceSettings() + setTouchButtonDuration() + setRainSensor() + refresh())
 }
 
-def createChildDevices() {
+def createChildDevices() {	
 	log.debug "create children"
 	def pumpMasterZone = (pumpMasterZone ? pumpMasterZone.replaceFirst("Zone ","").toInteger() : null)
 
@@ -229,24 +234,22 @@ def createChildDevices() {
 	state.oldLabel = device.label
 }
 
-def open() {
-	log.debug "open"
-    sendEvent(name: "valve", value: "open")
+def removeChildDevices() {
+	log.debug "remove all children"
+
+	//get and delete children avoids duplicate children
+	def children = getChildDevices()
+	if(children != null){
+		children.each{
+			deleteChildDevice(it.deviceNetworkId)
+		}
+	}
 }
 
-def closed() {
-	log.debug "closed"
-    sendEvent(name: "valve", value: "closed")
-}
-
-def setValveDuration(duration) {
-	log.debug "valveDuration ${duration}"
-	sendEvent(name: "valveDuration", value: duration, unit: "mins")
-}
 
 //----------------------------------commands--------------------------------------//
 
-def setStatus(status) {
+def setStatus(status){
 	if (DEBUG) log.debug "status ${status}"
 	sendEvent(name: "status", value: status, descriptionText: "Initialized")
 }

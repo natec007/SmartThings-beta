@@ -28,7 +28,26 @@
         }
     ],
     "automation": {
-        "conditions": [],
+        "conditions": [
+			{
+                "label": "Rain Sensor",
+                "displayType": "list",
+                "list": {
+                    "label": "Rain Sensor",
+                    "value": "rainSensor.value",
+                    "alternatives": [
+                        {
+                            "key": "rainsensoron",
+                            "value": "wet"
+                        },
+                        {
+                            "key": "rainsensoroff",						
+                            "value": "dry"
+                        }
+                    ]
+                }
+            }
+		],
         "actions": []
     },
     "id": "heartreturn55003.rainSensor",

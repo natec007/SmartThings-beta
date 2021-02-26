@@ -208,12 +208,22 @@
                 "visibleCondition": null
             },
             {
+                "component": "main",
+                "capability": "heartreturn55003.valveDuration",
+                "label": "Minutes",
+                "version": 1,
+                "displayType": "numberField",
+                "numberField": {
+                    "value": "valveDuration"
+                }
+            },
+            {
                 "component": "Zone1",
                 "capability": "valve",
                 "version": 1,
                 "values": [],
                 "visibleCondition": null
-            },
+            },            
             {
                 "component": "Zone2",
                 "capability": "valve",
@@ -327,6 +337,17 @@
                 "version": 1,
                 "values": [],
                 "visibleCondition": null
+            },
+            {
+                "component": "main",
+                "capability": "heartreturn55003.valveDuration",
+                "label": "Minutes",
+                "version": 1,
+                "displayType": "numberField",
+                "numberField": {
+                    "command": "setValveDuration",
+                    "range": [ 0, 100 ]
+                }
             },
             {
                 "component": "Zone1",

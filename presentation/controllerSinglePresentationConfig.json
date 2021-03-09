@@ -88,114 +88,82 @@
         {
             "component": "Zone1",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1           
         },
         {
             "component": "Zone2",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1            
         },
         {
             "component": "Zone3",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1
         },
         {
             "component": "Zone4",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1
         },
         {
             "component": "Zone5",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1
         },
         {
             "component": "Zone6",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1
         },
         {
             "component": "Zone7",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1
         },
         {
             "component": "Zone8",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1
         },
         {
             "component": "Zone9",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1
         },
         {
             "component": "Zone10",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1
         },
         {
             "component": "Zone11",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1
         },
         {
             "component": "Zone12",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1
         },
         {
             "component": "Zone13",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1
         },
         {
             "component": "Zone14",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1
         },
         {
             "component": "Zone15",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1
         },
         {
             "component": "Zone16",
             "capability": "valve",
-            "version": 1,
-            "values": [],
-            "visibleCondition": null
+            "version": 1
         }
     ],
     "automation": {

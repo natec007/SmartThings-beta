@@ -51,7 +51,7 @@ import physicalgraph.zigbee.zcl.DataType
 
 //dth version
 def getVERSION() {'v3.4 3-2021'}
-def getDEBUG() {true}
+def getDEBUG() {false}
 //zigbee cluster, attribute, identifiers
 def getON_OFF_CLUSTER() {0x0006}
 def getALARMS_CLUSTER() {0x0009}

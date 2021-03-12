@@ -1,0 +1,52 @@
+{
+    "dashboard": {
+        "states": [],
+        "actions": [],
+        "basicPlus": []
+    },
+    "detailView": [],
+    "automation": {
+        "conditions": [
+			{
+                "label": "Valve Control",
+                "displayType": "list",
+                "list": {
+                    "label": "Valve Control",
+                    "value": "valveControl.value",
+                    "alternatives": [
+                        {
+                            "key": "open",
+                            "value": "open"
+                        },
+                        {
+                            "key": "close",
+                            "value": "close"
+						}
+                    ]
+                }
+            }
+		],
+        "actions": [
+            {
+                "label": "Valve Control",
+                "displayType": "list",
+                "list": {
+                    "label": "Valve Control",
+                    "command": "setValveControl",
+                    "alternatives": [
+                        {
+                            "key": "open",
+                            "value": "open"
+                        },
+                        {
+                            "key": "close",
+                            "value": "close"
+						}
+                    ]
+                }
+            }
+		]
+    },
+    "id": "heartreturn55003.valveControl",
+    "version": 1
+}

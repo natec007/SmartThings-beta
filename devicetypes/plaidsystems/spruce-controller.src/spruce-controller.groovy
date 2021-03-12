@@ -10,6 +10,12 @@
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  *
+ 
+ Version v3.4
+ * update presentation with 'patch' to rename 'valve' to 'Zone x'
+ * remove commands on, off
+ * add command setValveDuration
+ 
  Version v3.3
  * change to remotecontrol with components
  
@@ -42,7 +48,7 @@ import groovy.json.JsonOutput
 import physicalgraph.zigbee.zcl.DataType
 
 //dth version
-def getVERSION() {'v3.3 12-2020'}
+def getVERSION() {'v3.4 3-2021'}
 def getDEBUG() {true}
 //zigbee cluster, attribute, identifiers
 def getON_OFF_CLUSTER() {0x0006}
@@ -55,7 +61,7 @@ def getPRESENT_VALUE_IDENTIFIER() {0x0055}
 
 metadata {
 	definition (name: "Spruce Controller", namespace: "plaidsystems", author: "Plaid Systems", mnmn: "SmartThingsCommunity",
-    	ocfDeviceType: "x.com.st.d.remotecontroller", mcdSync: true, vid: "fc74e230-50c6-349d-95a7-78c9cac035b5") {
+    	ocfDeviceType: "x.com.st.d.remotecontroller", mcdSync: true, vid: "7625a417-2805-3f25-8064-5083c1473055") {
 		
         capability "Actuator"
 		capability "Switch"
@@ -74,9 +80,7 @@ metadata {
 		attribute "controllerState", "string"
 		attribute "rainSensor", "string"
         attribute "valveDuration", "NUMBER"
-
-		command "on"
-		command "off"
+		
 		command "setStatus"
 		command "setRainSensor"
 		command "setControllerState"
@@ -148,7 +152,7 @@ def parse(String description) {
 		break
 	  case "schedule":
 		def scheduleValue = (value == 1 ? "on" : "off")
-		if (scheduleValue == "off") result.push(createEvent(name: "status", value: "Schedule ${scheduleValue}"))
+		if (scheduleValue == "off" && device.latestValue("controllerStatus") != "off") result.push(createEvent(name: "status", value: "Schedule ${scheduleValue}"))
 		result.push(createEvent(name: "switch", value: scheduleValue, displayed: false))
 		result.push(createEvent(name: "controllerState", value: scheduleValue))
 		break
@@ -259,6 +263,12 @@ def setRainSensor() {
 
 	if (rainSensorEnable) return zigbee.writeAttribute(BINARY_INPUT_CLUSTER, OUT_OF_SERVICE_IDENTIFIER, DataType.BOOLEAN, 1, [destEndpoint: 18])
 	else return zigbee.writeAttribute(BINARY_INPUT_CLUSTER, OUT_OF_SERVICE_IDENTIFIER, DataType.BOOLEAN, 0, [destEndpoint: 18])
+}
+
+def setValveDuration(duration) {
+	if (DEBUG) log.debug "Valve Duration set to: ${duration}"
+
+	sendEvent(name: "valveDuration", value: duration, displayed: false)
 }
 
 //cahnge the device settings for automatically starting a pump or master zone, set the controller to split scheduled watering cycles, set a delay between scheduled valves
@@ -537,27 +547,3 @@ def configureHealthCheck() {
 private hextoint(String hex) {
 	Long.parseLong(hex, 16).toInteger()
 }
-
-/*
-private hex(value) {
-	new BigInteger(Math.round(value).toString()).toString(16)
-}
-//${zigbee.swapEndianHex(zigbee.convertToHexString(groupAddr, 4))}
-private String swapEndianHex(String hex) {
-	reverseArray(hex.decodeHex()).encodeHex()
-}
-
-private byte[] reverseArray(byte[] array) {
-	int i = 0;
-	int j = array.length - 1;
-	byte tmp;
-	while (j > i) {
-		tmp = array[j];
-		array[j] = array[i];
-		array[i] = tmp;
-		j--;
-		i++;
-	}
-	return array
-}
-*/

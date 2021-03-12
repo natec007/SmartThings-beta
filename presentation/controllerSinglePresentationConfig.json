@@ -1,6 +1,6 @@
 {
     "mnmn": "SmartThingsCommunity",
-    "vid": "6a8d4aa7-64a1-39ff-ba49-756482356522",
+    "vid": "fc74e230-50c6-349d-95a7-78c9cac035b5",
     "type": "dth",
     "dpInfo": null,
     "iconUrl": null,
@@ -8,15 +8,19 @@
         "states": [
             {
                 "component": "main",
-                "capability": "switch",
+                "capability": "heartreturn55003.controllerState",
                 "version": 1,
                 "values": [
                     {
-                        "key": "switch",
-                        "enabledValues": ["on", "off"]
+                        "key": "controllerState",
+                        "enabledValues": [
+                            "on",
+                            "pause",
+                            "resume",
+                            "off"
+                        ]
                     }
-                ],
-                "visibleCondition": null
+                ]
             }
         ],
         "actions": [
@@ -27,10 +31,12 @@
                 "values": [
                     {
                         "key": "switch",
-                        "enabledValues": ["on", "off"]
+                        "enabledValues": [
+                            "on",
+                            "off"
+                        ]
                     }
-                ],
-                "visibleCondition": null
+                ]
             }
         ]
     },
@@ -42,11 +48,15 @@
             "values": [
                 {
                     "key": "controllerState",
-                    "enabledValues": ["on", "programOn", "programOff", "off"]
+                    "enabledValues": [
+                        "on",
+                        "pause",
+                        "resume",
+                        "off"
+                    ]
                 }
-            ],            
-            "visibleCondition": null
-        },               
+            ]
+        },
         {
             "component": "main",
             "capability": "heartreturn55003.status",
@@ -55,9 +65,8 @@
                 {
                     "key": "status"
                 }
-            ],
-            "visibleCondition": null
-        },        
+            ]
+        },
         {
             "component": "main",
             "capability": "heartreturn55003.rainSensor",
@@ -66,34 +75,32 @@
                 {
                     "key": "rainSensor"
                 }
-            ],
-            "visibleCondition": null
+            ]
         },
         {
             "component": "main",
             "capability": "heartreturn55003.valveDuration",
             "version": 1,
             "values": [
-				{
-					"key": "valveDuration",
-					"range": [
-						1,
-						100
-					],
-					"step": 1
-				}
-			],
-            "visibleCondition": null
+                {
+                    "key": "valveDuration",
+                    "range": [
+                        1,
+                        100
+                    ],
+                    "step": 1
+                }
+            ]
         },
         {
             "component": "Zone1",
             "capability": "valve",
-            "version": 1           
+            "version": 1
         },
         {
             "component": "Zone2",
             "capability": "valve",
-            "version": 1            
+            "version": 1
         },
         {
             "component": "Zone3",
@@ -167,7 +174,7 @@
         }
     ],
     "automation": {
-        "conditions": [            
+        "conditions": [
             {
                 "component": "main",
                 "capability": "heartreturn55003.controllerState",
@@ -180,14 +187,14 @@
             },
             {
                 "component": "main",
-                "capability": "heartreturn55003.rainSensor",                
+                "capability": "heartreturn55003.rainSensor",
                 "label": "Rain Sensor",
                 "version": 1,
                 "displayType": "list",
-                "list": {                    
-                    "value": "rainSensor"                    
+                "list": {
+                    "value": "rainSensor"
                 }
-            },            
+            },
             {
                 "component": "main",
                 "capability": "heartreturn55003.valveDuration",
@@ -199,139 +206,203 @@
                         1,
                         100
                     ],
-                    "step": 1,                
+                    "step": 1,
                     "unit": "valveDuration.unit",
                     "value": "valveDuration.value"
                 }
-            },
+            },            
             {
                 "component": "Zone1",
                 "capability": "valve",
-                "label": "Zone 1",
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 1"
+                    }
+                ],
                 "componentLabel": "Zone 1",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
-            },
+                "version": 1
+            },            
             {
                 "component": "Zone2",
                 "capability": "valve",
-                "label": "Zone 2",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 2"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone3",
                 "capability": "valve",
-                "label": "Zone 3",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 3"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone4",
                 "capability": "valve",
-                "label": "Zone 4",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 4"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone5",
                 "capability": "valve",
-                "label": "Zone 5",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 5"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone6",
                 "capability": "valve",
-                "label": "Zone 6",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 6"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone7",
                 "capability": "valve",
-                "label": "Zone 7",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 7"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone8",
                 "capability": "valve",
-                "label": "Zone 8",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 8"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone9",
                 "capability": "valve",
-                "label": "Zone 9",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 9"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone10",
                 "capability": "valve",
-                "label": "Zone 10",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 10"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone11",
                 "capability": "valve",
-                "label": "Zone 11",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 11"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone12",
                 "capability": "valve",
-                "label": "Zone 12",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 12"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone13",
                 "capability": "valve",
-                "label": "Zone 13",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 13"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone14",
                 "capability": "valve",
-                "label": "Zone 14",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 14"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone15",
                 "capability": "valve",
-                "label": "Zone 15",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 15"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone16",
                 "capability": "valve",
-                "label": "Zone 16",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 16"
+                    }
+                ],
+                "version": 1
             }
         ],
         "actions": [
@@ -340,7 +411,7 @@
                 "capability": "heartreturn55003.controllerState",
                 "label": "Controller State",
                 "version": 1,
-                "displayType": "list",                
+                "displayType": "list",
                 "list": {
                     "label": "Controller State",
                     "value": "controllerState.value",
@@ -352,8 +423,8 @@
                         {
                             "key": "pause",
                             "value": "pause"
-						},
-						{
+                        },
+                        {
                             "key": "resume",
                             "value": "resume"
                         },
@@ -375,7 +446,7 @@
                         1,
                         100
                     ],
-                    "step": 1,                
+                    "step": 1,
                     "unit": "valveDuration.unit",
                     "command": "setValveDuration"
                 }
@@ -383,131 +454,194 @@
             {
                 "component": "Zone1",
                 "capability": "valve",
-                "label": "Zone 1",
-                "componentLabel": "Zone 1",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 1"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone2",
                 "capability": "valve",
-                "label": "Zone 2",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 2"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone3",
                 "capability": "valve",
-                "label": "Zone 3",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 3"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone4",
                 "capability": "valve",
-                "label": "Zone 4",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 4"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone5",
                 "capability": "valve",
-                "label": "Zone 5",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 5"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone6",
                 "capability": "valve",
-                "label": "Zone 6",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 6"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone7",
                 "capability": "valve",
-                "label": "Zone 7",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 7"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone8",
                 "capability": "valve",
-                "label": "Zone 8",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 8"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone9",
                 "capability": "valve",
-                "label": "Zone 9",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 9"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone10",
                 "capability": "valve",
-                "label": "Zone 10",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 10"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone11",
                 "capability": "valve",
-                "label": "Zone 11",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 11"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone12",
                 "capability": "valve",
-                "label": "Zone 12",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 12"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone13",
                 "capability": "valve",
-                "label": "Zone 13",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 13"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone14",
                 "capability": "valve",
-                "label": "Zone 14",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 14"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone15",
                 "capability": "valve",
-                "label": "Zone 15",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 15"
+                    }
+                ],
+                "version": 1
             },
             {
                 "component": "Zone16",
                 "capability": "valve",
-                "label": "Zone 16",
-                "version": 1,
-                "values": [],
-                "visibleCondition": null
+                "patch": [
+                    {
+                        "op": "replace",
+                        "path": "/0/label",
+                        "value": "Zone 16"
+                    }
+                ],
+                "version": 1
             }
         ]
     }

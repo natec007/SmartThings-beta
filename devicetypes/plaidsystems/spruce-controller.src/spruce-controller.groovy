@@ -60,7 +60,7 @@ def getOUT_OF_SERVICE_IDENTIFIER() {0x0051}
 def getPRESENT_VALUE_IDENTIFIER() {0x0055}
 
 metadata {
-	definition (name: "Spruce Controller", namespace: "plaidsystems", author: "Plaid Systems", mnmn: "SmartThingsCommunity",
+	definition (name: "Spruce Controller v830", namespace: "plaidsystems", author: "Plaid Systems", mnmn: "SmartThingsCommunity",
     	ocfDeviceType: "x.com.st.d.remotecontroller", mcdSync: true, vid: "7625a417-2805-3f25-8064-5083c1473055") {
 		
         capability "Actuator"

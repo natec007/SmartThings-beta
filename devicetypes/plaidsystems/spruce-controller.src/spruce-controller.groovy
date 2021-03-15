@@ -72,7 +72,6 @@ metadata {
 
 		capability "Actuator"
 		capability "Switch"
-		capability "Valve"
 		capability "Sensor"
 		capability "Health Check"
 		capability "heartreturn55003.status"
@@ -494,7 +493,7 @@ def configure() {
 	// Device-Watch allows 2 check-in misses from device, checks every 2 hours
 	sendEvent(name: "DeviceWatch-DeviceStatus", value: "online")
 	sendEvent(name: "healthStatus", value: "online")
-	sendEvent(name: "checkInterval", value: hcIntervalMinutes * 60, displayed: false, data: [protocol: "zigbee", hubHardwareId: device.hub.hardwareID])
+	sendEvent(name: "DeviceWatch-Enroll", value: hcIntervalMinutes * 60, displayed: false, data: [protocol: "zigbee", hubHardwareId: device.hub.hardwareID])
 
 	if (DEBUG) log.debug "Configuring Reporting and Bindings ${device.name} ${device.deviceNetworkId} ${device.hub.zigbeeId}"
 

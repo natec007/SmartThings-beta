@@ -72,7 +72,6 @@ metadata {
 
 		capability "Actuator"
 		capability "Switch"
-		capability "Valve"
 		capability "Sensor"
 		capability "Health Check"
 		capability "heartreturn55003.status"
@@ -317,7 +316,7 @@ def setTouchButtonDuration() {
 	if (DEBUG) log.debug "touchButtonDuration ${touchButtonDuration} mins"
 
 	def sendCmds = []
-	sendCmds.push(zigbee.writeAttribute(ONOFF_CLUSTER, OFF_WAIT_TIME_ATTRIBUTE, DataType.UINT16, touchButtonDuration, [destEndpoint: 1]))
+	sendCmds.push(zigbee.writeAttribute(zigbee.ONOFF_CLUSTER, OFF_WAIT_TIME_ATTRIBUTE, DataType.UINT16, touchButtonDuration, [destEndpoint: 1]))
 	return sendCmds
 }
 
@@ -392,10 +391,10 @@ def noSchedule() {
 
 //schedule on/off
 def scheduleOn() {
-	zigbee.command(ONOFF_CLUSTER, 1, "", [destEndpoint: 1])
+	zigbee.command(zigbee.ONOFF_CLUSTER, 1, "", [destEndpoint: 1])
 }
 def scheduleOff() {
-	zigbee.command(ONOFF_CLUSTER, 0, "", [destEndpoint: 1])
+	zigbee.command(zigbee.ONOFF_CLUSTER, 0, "", [destEndpoint: 1])
 }
 
 // Commands to zones/valves
@@ -405,7 +404,7 @@ def valveOn(valueMap) {
 	def duration = (device.latestValue("valveDuration").toInteger())
 
 	sendEvent(name: "status", value: "${valueMap.label} on for ${duration}min(s)", descriptionText: "Zone ${valueMap.label} on for ${duration}min(s)")
-	if (DEBUG) log.debug "state ${state.hasConfiguredHealthCheck} ${ONOFF_CLUSTER}"
+	if (DEBUG) log.debug "state ${state.hasConfiguredHealthCheck} ${zigbee.ONOFF_CLUSTER}"
 	zoneOn(endpoint, duration)
 }
 
@@ -419,17 +418,17 @@ def valveOff(valueMap) {
 
 def zoneOn(endpoint, duration) {
 	//send duration from slider
-	return zoneDuration(duration) + zigbee.command(ONOFF_CLUSTER, 1, "", [destEndpoint: endpoint])
+	return zoneDuration(duration) + zigbee.command(zigbee.ONOFF_CLUSTER, 1, "", [destEndpoint: endpoint])
 }
 
 def zoneOff(endpoint) {
 	//reset touchButtonDuration to setting value
-	return zigbee.command(ONOFF_CLUSTER, 0, "", [destEndpoint: endpoint]) + setTouchButtonDuration()
+	return zigbee.command(zigbee.ONOFF_CLUSTER, 0, "", [destEndpoint: endpoint]) + setTouchButtonDuration()
 }
 
 def zoneDuration(int duration) {
 	def sendCmds = []
-	sendCmds.push(zigbee.writeAttribute(ONOFF_CLUSTER, OFF_WAIT_TIME_ATTRIBUTE, DataType.UINT16, duration, [destEndpoint: 1]))
+	sendCmds.push(zigbee.writeAttribute(zigbee.ONOFF_CLUSTER, OFF_WAIT_TIME_ATTRIBUTE, DataType.UINT16, duration, [destEndpoint: 1]))
 	return sendCmds
 }
 
@@ -449,16 +448,16 @@ def startSchedule() {
 			totalTime += runTime
 			startRun = true
 
-			scheduleTimes.push(zigbee.writeAttribute(ONOFF_CLUSTER, OFF_WAIT_TIME_ATTRIBUTE, DataType.UINT16, runTime, [destEndpoint: endpoint]))
+			scheduleTimes.push(zigbee.writeAttribute(zigbee.ONOFF_CLUSTER, OFF_WAIT_TIME_ATTRIBUTE, DataType.UINT16, runTime, [destEndpoint: endpoint]))
 		}
 		else {
-			scheduleTimes.push(zigbee.writeAttribute(ONOFF_CLUSTER, OFF_WAIT_TIME_ATTRIBUTE, DataType.UINT16, 0, [destEndpoint: endpoint]))
+			scheduleTimes.push(zigbee.writeAttribute(zigbee.ONOFF_CLUSTER, OFF_WAIT_TIME_ATTRIBUTE, DataType.UINT16, 0, [destEndpoint: endpoint]))
 		}
 	}
 	if (!startRun || totalTime == 0) return noSchedule()
 
 	//start after scheduleTimes are sent
-	scheduleTimes.push(zigbee.command(ONOFF_CLUSTER, 1, "", [destEndpoint: 1]))
+	scheduleTimes.push(zigbee.command(zigbee.ONOFF_CLUSTER, 1, "", [destEndpoint: 1]))
 	sendEvent(name: "status", value: "Scheduled for ${totalTime}min(s)", descriptionText: "Start schedule ending in ${totalTime} mins")
 	return scheduleTimes
 }
@@ -472,8 +471,8 @@ def settingsMap(WriteTimes, attrType) {
 		if (WriteTimes."${endpoint}") {
 			runTime = Integer.parseInt(WriteTimes."${endpoint}")
 
-			if (attrType == ON_TIME_ATTRIBUTE) sendCmds.push(zigbee.writeAttribute(ONOFF_CLUSTER, ON_TIME_ATTRIBUTE, DataType.UINT16, runTime, [destEndpoint: endpoint]))
-			else sendCmds.push(zigbee.writeAttribute(ONOFF_CLUSTER, OFF_WAIT_TIME_ATTRIBUTE, DataType.UINT16, runTime, [destEndpoint: endpoint]))
+			if (attrType == ON_TIME_ATTRIBUTE) sendCmds.push(zigbee.writeAttribute(zigbee.ONOFF_CLUSTER, ON_TIME_ATTRIBUTE, DataType.UINT16, runTime, [destEndpoint: endpoint]))
+			else sendCmds.push(zigbee.writeAttribute(zigbee.ONOFF_CLUSTER, OFF_WAIT_TIME_ATTRIBUTE, DataType.UINT16, runTime, [destEndpoint: endpoint]))
 		}
 	}
 	return sendCmds
@@ -481,12 +480,12 @@ def settingsMap(WriteTimes, attrType) {
 
 //send switch time
 def writeType(endpoint, cycle) {
-	zigbee.writeAttribute(ONOFF_CLUSTER, ON_TIME_ATTRIBUTE, DataType.UINT16, cycle, [destEndpoint: endpoint])
+	zigbee.writeAttribute(zigbee.ONOFF_CLUSTER, ON_TIME_ATTRIBUTE, DataType.UINT16, cycle, [destEndpoint: endpoint])
 }
 
 //send switch off time
 def writeTime(endpoint, runTime) {
-	zigbee.writeAttribute(ONOFF_CLUSTER, OFF_WAIT_TIME_ATTRIBUTE, DataType.UINT16, runTime, [destEndpoint: endpoint])
+	zigbee.writeAttribute(zigbee.ONOFF_CLUSTER, OFF_WAIT_TIME_ATTRIBUTE, DataType.UINT16, runTime, [destEndpoint: endpoint])
 }
 
 //set reporting and binding
@@ -494,13 +493,13 @@ def configure() {
 	// Device-Watch allows 2 check-in misses from device, checks every 2 hours
 	sendEvent(name: "DeviceWatch-DeviceStatus", value: "online")
 	sendEvent(name: "healthStatus", value: "online")
-	sendEvent(name: "checkInterval", value: hcIntervalMinutes * 60, displayed: false, data: [protocol: "zigbee", hubHardwareId: device.hub.hardwareID])
+	sendEvent(name: "DeviceWatch-Enroll", value: hcIntervalMinutes * 60, displayed: false, data: [protocol: "zigbee", hubHardwareId: device.hub.hardwareID])
 
 	if (DEBUG) log.debug "Configuring Reporting and Bindings ${device.name} ${device.deviceNetworkId} ${device.hub.zigbeeId}"
 
 	//setup binding for 18 endpoints
 	def bindCmds = []
-	bindCmds += zigbee.addBinding(ONOFF_CLUSTER, [destEndpoint: 1])
+	bindCmds += zigbee.addBinding(zigbee.ONOFF_CLUSTER, [destEndpoint: 1])
 	bindCmds += zigbee.addBinding(ALARMS_CLUSTER, [destEndpoint: 1])
 
 	for (endpoint in 1..18) {
@@ -509,7 +508,7 @@ def configure() {
 
 	//setup reporting for 18 endpoints
 	def reportingCmds = []
-	reportingCmds += zigbee.configureReporting(ONOFF_CLUSTER, 0, DataType.BOOLEAN, 1, 0, 0x01, [destEndpoint: 1])
+	reportingCmds += zigbee.configureReporting(zigbee.ONOFF_CLUSTER, 0, DataType.BOOLEAN, 1, 0, 0x01, [destEndpoint: 1])
 	reportingCmds += zigbee.configureReporting(ALARMS_CLUSTER, 0, DataType.UINT16, 1, 0, 0x00, [destEndpoint: 1])
 
 	for (endpoint in 1..18) {

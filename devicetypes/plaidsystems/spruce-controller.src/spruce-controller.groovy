@@ -207,7 +207,6 @@ def commandType(endpoint, cluster) {
 //--------------------end zigbee parse-------------------------------//
 
 def installed() {
-	initialize()	//remove after test
 	createChildDevices()
 }
 

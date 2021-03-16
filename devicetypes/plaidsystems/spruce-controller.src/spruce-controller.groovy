@@ -57,7 +57,7 @@ import physicalgraph.zigbee.zcl.DataType
 //dth version
 def getVERSION() {'v3.5 3-2021'}
 def getDEBUG() {false}
-def gethcIntervalMinutes() {60}
+def getHC_INTERVAL_MINS() {60}
 //zigbee cluster, attribute, identifiers
 def getALARMS_CLUSTER() {0x0009}
 def getBINARY_INPUT_CLUSTER() {0x000F}
@@ -93,7 +93,7 @@ metadata {
 		command "setValveDuration"
 
 		//new release
-		fingerprint manufacturer: "PLAID SYSTEMS", model: "PS-SPRZ16-01", deviceJoinName: "Spruce Irrigation Controller"
+		fingerprint manufacturer: "PLAID SYSTEMS", model: "PS-SPRZ16-01", zigbeeNodeType: "ROUTER", deviceJoinName: "Spruce Irrigation Controller"
 	}
 
 	preferences {
@@ -490,10 +490,8 @@ def writeTime(endpoint, runTime) {
 
 //set reporting and binding
 def configure() {
-	// Device-Watch allows 2 check-in misses from device, checks every 2 hours
-	sendEvent(name: "DeviceWatch-DeviceStatus", value: "online")
-	sendEvent(name: "healthStatus", value: "online")
-	sendEvent(name: "DeviceWatch-Enroll", value: hcIntervalMinutes * 60, displayed: false, data: [protocol: "zigbee", hubHardwareId: device.hub.hardwareID])
+	// Device-Watch checks every 1 hour
+	sendEvent(name: "checkInterval", value: HC_INTERVAL_MINS * 60, displayed: false, data: [protocol: "zigbee", hubHardwareId: device.hub.hardwareID])
 
 	if (DEBUG) log.debug "Configuring Reporting and Bindings ${device.name} ${device.deviceNetworkId} ${device.hub.zigbeeId}"
 
@@ -521,7 +519,7 @@ def configure() {
 //PING is used by Device-Watch in attempt to reach the Device
 def ping() {
 	if (DEBUG) log.debug "device health ping"
-	return zigbee.onOffRefresh()
+	return refresh()
 }
 
 def refresh() {

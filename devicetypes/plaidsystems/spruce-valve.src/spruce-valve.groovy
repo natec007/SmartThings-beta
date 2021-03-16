@@ -39,7 +39,7 @@ def updated() {
 }
 
 private initialize() {
-	sendEvent(name: "valve", value: "closed")	
+	sendEvent(name: "valve", value: "closed")
 }
 
 def open() {

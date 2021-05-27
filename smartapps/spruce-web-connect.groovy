@@ -1,19 +1,8 @@
 /**
  *  Spruce Web Connect
- *  v1.01 - 01/19/17 - fix variable initialization for schedules
- *  v1.02 - 01/22/17 - added state var to fix notifications for manual schedule starts that are pushed from the webapp
- *  v1.03 - 02/19/17 - edit finished time wording/remove superfluous 'at'; fixed time display errors when updating schedule times; fix state variable assignment for active schedule for proper api reporting.
- *  v1.04 - 03/15/17 - add support for rain sensor
- *  v1.041- 03/18/17 - bugfix issue from 1.04 where zone states were not sending properly
- *  v1.05 - 04/04/17 - runlist retry if not retrieved. after 2nd attempt, skip watering.
- *  v1.06 - 05/08/17 - add responses for all endpoints. update api endpoints. improve runlist response handling + fix retry. bugfix for saving new schedules to map.
- *	v1.07 - 05/11/17 - convert battery % back to voltage ln 583
- *	v1.08 - 08/10/17 - add schedule queue
- *	v1.09 - 08/15/17 - add Gen1/2 selection
- *  v1.10 - 08/28/17 - atomic state
- *	v1.11 - 09/08/17 - switches = false
+ *  v2.00 - 05/25/21 - update to work with 2021 Spruce device
  *
- *  Copyright 2017 Plaid Systems
+ *  Copyright 2021 Plaid Systems
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -26,7 +15,7 @@
  *
  */
 definition(
-    name: "Spruce Web Connect",
+    name: "Spruce Gen1 Connect",
     namespace: "plaidsystems",
     author: "Plaid Systems",
     description: "Connect Spruce devices to the Spruce Cloud",
@@ -39,6 +28,9 @@ definition(
 	appSetting "clientId"
 	appSetting "clientSecret"
     appSetting "serverUrl"
+    
+    atomicState.clientid = "smartthings"
+    atomicState.clientSecret = "081ce71eec73b1fdad2253d1d88819a5"
 }
 
 preferences (oauthPage: "authPage") {
@@ -71,14 +63,15 @@ def pageConnect() {
                 href url: spruce_oauth_url, style:"embedded", required:false, title:"Login to Spruce Cloud", image: 'http://www.plaidsystems.com/smartthings/st_spruce_leaf_250f.png', description: "Login to grant access"
             }
         }
-    }
-    else if (gen != null){
+    }/*
+    else if (gen != null) {
     	Serial.println(gen)
     	pageDevices()
     }
-    else pageController()
+    else pageController()*/
+    else pageDevices()
 }
-
+/*
 def pageController() {
     if(!atomicState.key)    {
 		pageConnect()
@@ -91,24 +84,21 @@ def pageController() {
         }
     }    
 }
-            
+*/            
 def pageDevices() {
     if(!atomicState.key)    {
 		pageConnect()
     }
     else {
     	dynamicPage(name: "pageDevices", uninstall: true, install:true) { 
-            if (gen == "Gen1"){
+            //if (gen == "Gen1") {
             section("Select Spruce Controllers to connect, do not select individual zones:") {
                 input "switches", "capability.switch", title: "Spruce Irrigation Controller:", required: false, multiple: false 
-            }}
+            }//}
             section("Select Spruce Sensors to connect:") {
                 input "sensors", "capability.relativeHumidityMeasurement", title: "Spruce Moisture sensors:", required: false, multiple: true 
-            }/*
-            section ("Edit Schedules on the Spruce Cloud"){
-                href url:"https://app.spruceirrigation.com/schedule", style:"embedded", required:false, title:"Schedules", image: 'http://www.plaidsystems.com/smartthings/st_spruce_leaf_250f.png', description: ""
-            }*/
-            section ("Tap Done to save changes to Spruce Cloud"){
+            }
+            section ("Tap Done to save changes to Spruce Cloud") {
                 href url:"https://app.spruceirrigation.com/devices", style:"external", required:false, title:"Spruce WebApp", image: 'http://www.plaidsystems.com/smartthings/st_spruce_leaf_250f.png', description: "Click to visit app.spruceirrigation.com"
             }      
             section {
@@ -130,8 +120,8 @@ def pageUnsetKey() {
 def oauthInitUrl() /*not used*/
 {
     log.debug "oauthInitUrl"    
-    def oauthClientId = appSettings.clientId
-	def oauthClientSecret = appSettings.clientSecret
+    def oauthClientId = atomicState.clientId
+	def oauthClientSecret = atomicState.clientSecret
 	def oauth_url = "https://app.spruceirrigation.com/connect-smartthings?client=${oauthClientId}&secret=${oauthClientSecret}"
     
     log.debug(oauthClientId)
@@ -207,29 +197,26 @@ def initialize() {
     if (settings.sensors) getSensors()
     
     //add devices to web, check for schedules
-    if(atomicState.key){
+    if(atomicState.key) {
     	addDevices()
     	addSchedules()
 	}
 }
 
 //set spruce api key
-def setKey(){
+def setKey() {
 	log.debug "setkey: " + params.command
     
 	atomicState.key = params.command    
     if (atomicState.key && atomicState.key == params.command) {
-    	log.debug "API key set, get schedules"
-        //getSchedule()
+    	log.debug "API key set, get schedules"        
         return [error: false, return_value: 1, data: 'key set']
         }
-    else return [error: true, return_value: 0, data: 'key not set']
-    //else return httpError(400, "$command is not a valid command for all switches specified")
-       
+    else return [error: true, return_value: 0, data: 'key not set']       
 }
 
 //set pump delay
-def setDelay(){
+def setDelay() {
 	//I'm sending deviceid and delay - still need to update to parse the 2 
     //   /delay/deviceid=' + deviceID + '&delay=' + value;
 	log.debug "setdelay: " + params.command
@@ -248,13 +235,11 @@ def setDelay(){
     	log.debug "Delay deleted "
         return [error: false, return_value: 1, data: 'delay deleted']
     }
-    else return [error: true, return_value: 0, data: 'delay not set']
-    //else return httpError(400, "$command is not a valid command for all switches specified")
-       
+    else return [error: true, return_value: 0, data: 'delay not set']       
 }
 
 //switch subscriptions
-def getSwitches(){
+def getSwitches() {
 	log.debug "getSwitches: " + settings.switches    
     
     //atomicState.switches = [:]
@@ -262,31 +247,16 @@ def getSwitches(){
     settings.switches.each{
     	tempMap[it]= (it.device.zigbeeId)
         }
-    atomicState.switches = tempMap 
-    
+    atomicState.switches = tempMap
+        
     subscribe(settings.switches, "switch", switchHandler)
-    subscribe(settings.switches, "switch1", switchHandler)
-    subscribe(settings.switches, "switch2", switchHandler)
-    subscribe(settings.switches, "switch3", switchHandler)
-    subscribe(settings.switches, "switch4", switchHandler)
-    subscribe(settings.switches, "switch5", switchHandler)
-    subscribe(settings.switches, "switch6", switchHandler)
-    subscribe(settings.switches, "switch7", switchHandler)
-    subscribe(settings.switches, "switch8", switchHandler)
-    subscribe(settings.switches, "switch9", switchHandler)
-    subscribe(settings.switches, "switch10", switchHandler)
-    subscribe(settings.switches, "switch11", switchHandler)
-    subscribe(settings.switches, "switch12", switchHandler)
-    subscribe(settings.switches, "switch13", switchHandler)
-    subscribe(settings.switches, "switch14", switchHandler)
-    subscribe(settings.switches, "switch15", switchHandler)
-    subscribe(settings.switches, "switch16", switchHandler)
-    subscribe(settings.switches, "rainsensor", switchHandler)
+    subscribe(settings.switches, "status", switchHandler)
+    subscribe(settings.switches, "rainSensor", switchHandler)    
     
 }
 
 //sensor subscriptions
-def getSensors(){    
+def getSensors() {    
     log.debug "getSensors: " + settings.sensors    
     
     //atomicState.sensors = [:]    
@@ -303,7 +273,7 @@ def getSensors(){
 }
 
 //add devices to web
-def addDevices(){
+def addDevices() {
 	
     //add controllers to web
     def tempSwitchMap = atomicState.switches
@@ -320,7 +290,7 @@ def addDevices(){
         ]    
         log.debug PUTparams
         try{
-            httpPut(PUTparams){
+            httpPut(PUTparams) {
                 resp -> //resp.data {
                     log.debug "${resp.data}"               
                 }                
@@ -344,7 +314,7 @@ def addDevices(){
                 ]
         ]    
         try{
-            httpPut(PUTparams){
+            httpPut(PUTparams) {
                 resp -> //resp.data {
                     log.debug "${resp.data}"               
             }                
@@ -360,7 +330,7 @@ def addDevices(){
 
 //***************** schedule setup commands ******************************
 //check for pre-set schedules
-def addSchedules(){
+def addSchedules() {
 	def respMessage = ""
     def key = atomicState.key
     def switchID
@@ -384,19 +354,19 @@ def addSchedules(){
                 ]
 
         try{ httpGet(GETparams) { resp ->	
-            //get schedule list        
-            scheduleID = resp.data['controller'][switchID]['schedules'].split(',')
-            if (scheduleID) {
+            //get schedule list
+			log.debug resp.data            
+            if (resp.data['controller'][switchID]['schedules']) {
                 //get schedule types
+				scheduleID = resp.data['controller'][switchID]['schedules'].split(',')
                 def i = 1
                 scheduleID.each{
                     if ( resp.data['schedule'][it]['sched_enabled'] == '1') {
                         scheduleType = resp.data['schedule'][it]['schedule_type']
-                        if (scheduleType == 'connected' || scheduleType == 'basic'){                    	
-                            //atomicState.scheduleMap[it] = ['id': i, 'deviceid' : switchID, 'start_time' : resp.data['schedule'][it]['start_time']]
+                        if (scheduleType == 'connected' || scheduleType == 'basic') {                            
                             tempSchMap[i] = ['scheduleid' : it, 'deviceid' : switchID, 'start_time' : resp.data['schedule'][it]['start_time'], 'name' : resp.data['schedule'][it]['schedule_name']]
-                            }                     
-                            i++                        
+                            }
+                        i++                        
                     }
                     if (resp.data['schedule'][it]['sched_enabled'] == '1' && resp.data['schedule'][it]['schedule_type'] == 'manual') {
                             respMessage += " Manual Sch acquired, "
@@ -421,7 +391,7 @@ def addSchedules(){
 }
 
 //set schedules times to run
-def setScheduleTimes(){
+def setScheduleTimes() {
 	unschedule()
     //log.debug "setting schedule times"
     def message = "";    
@@ -459,17 +429,16 @@ def setSchedule() {
     
     boolean Sch_Set
     def count = 0
-    if (sch[4].split('=')[1] == 'manual'){    	
+    if (sch[4].split('=')[1] == 'manual') {    	
     	atomicState.manualMap = ['scheduleid' : sch[0].split('=')[1], 'start_time' : sch[1].split('=')[1], 'name' : sch[2].split('=')[1], 'type' : sch[4].split('=')[1]]        
         Sch_Set = true
        }
-    else if (atomicState.scheduleMap){
+    else if (atomicState.scheduleMap) {
     	def tempMap = atomicState.scheduleMap
     	tempMap.each{        	
-       		//log.debug "key $it.key, count $count"
-            //if (count == it.key.toInteger()) count++            
+       		//log.debug "key $it.key, count $count"            
             count++            
-            if (tempMap[it.key]['scheduleid'] == sch[0].split('=')[1]  && !Sch_Set){
+            if (tempMap[it.key]['scheduleid'] == sch[0].split('=')[1]  && !Sch_Set) {
             	
                 tempMap[it.key]['start_time'] = sch[1].split('=')[1]
                 tempMap[it.key]['name'] = sch[2].split('=')[1]
@@ -488,9 +457,9 @@ def setSchedule() {
         Sch_Set = true
 		log.debug "Schedule created"
     }
-    if (!Sch_Set && count <= 6){
+    if (!Sch_Set && count <= 6) {
     	def tempMap = atomicState.scheduleMap
-        for ( count = 1; count <= 6; count++){
+        for ( count = 1; count <= 6; count++) {
         	//log.debug atomicState.scheduleMap[count.toString()]            
             if (tempMap[count.toString()] == null && !Sch_Set) {
             	tempMap[count.toString()] = ['scheduleid' : sch[0].split('=')[1], 'start_time' : sch[1].split('=')[1], 'name' : sch[2].split('=')[1], 'type' : sch[4].split('=')[1]]        
@@ -501,11 +470,9 @@ def setSchedule() {
          atomicState.scheduleMap = tempMap
         }
    	
-    if (Sch_Set){
-    	
+    if (Sch_Set) {    	
         setScheduleTimes()    
         return [error: false, return_value: 1]
-		//return httpError(200, "schedule set")
         }
     else return [error: true, return_value: 0, message: "schedule declined, count exceeded 6"] //return httpError(200, "schedule declined, count exceeded 6") 
     
@@ -522,10 +489,10 @@ def deleteSchedule() {
     def count = 0
     boolean remove = false
         
-    if (atomicState.scheduleMap){
+    if (atomicState.scheduleMap) {
     	def tempMap = atomicState.scheduleMap
     	tempMap.each{        	
-       		if (tempMap[it.key]['scheduleid'] == sch_id){            	           
+       		if (tempMap[it.key]['scheduleid'] == sch_id) {            	           
             	count = it.key
                 remove = true
                 message += tempMap[it.key]['name']
@@ -554,45 +521,56 @@ def parse(description) {
 
 //controller evts
 def switchHandler(evt) {    
-    log.debug "switchHandler: ${evt.device}, ${evt.name}, ${evt.value}"
+    log.debug "switchHandler: ${evt.device}, ${evt.name}, ${evt.value}"    
     def scheduleMap
     def scheduleid = 0
     def duration = 0
     def tempSwitchesMap = atomicState.switches
     def tempSchMap = atomicState.scheduleMap
     def tempTimeMap = atomicState.timeMap
-       
-    //post zone on/off to web
-    if (evt.value.contains('on') || evt.value.contains('off')){
-        
-        def device = tempSwitchesMap["${evt.device}"]   
-        def zonestate = 1
-        if (evt.value.contains('off')) zonestate = 0    
-        
-        def EP = 0
-        if (evt.name == "rainsensor") {
-        	EP = 101
-        }        
-        else if (evt.name != "switch") {
-        	EP = evt.name.replace('switch',"").toInteger()
+    def device = tempSwitchesMap["${evt.device}"]
+    
+    def EP = 0
+    def zonestate = 1
+    boolean post = true
+    switch (evt.name) {
+	  case "switch":
+		if (evt.value.contains('off')) zonestate = 0
+		break
+     case "status":
+		if (evt.value.contains('open') || evt.value.contains('closed')) {
+        	EP = evt.value.substring(4,7).toInteger()            
         }
-        
-        
-        if (atomicState.active_sch != "none" && atomicState.run_today){
+        if (evt.value.contains('closed')) zonestate = 0
+        if (evt.value.contains('off')) zonestate = 0
+		break
+     case "rainSensor":
+		EP = 101
+        if (evt.value.contains('dry')) zonestate = 0
+        if (evt.value.contains('disabled')) zonestate = 0
+		break
+     default:
+	  	log.debug "${evt.name} not found"
+        post = false
+		break
+	}
+    
+    //post to Spruce Cloud
+	if (post) {
+     
+        if (atomicState.active_sch != "none" && atomicState.run_today) {
             if (tempSchMap[atomicState.active_sch]) scheduleMap = tempSchMap[atomicState.active_sch]
             else if (atomicState.active_sch == 'manual') scheduleMap = atomicState.manualMap
             else if (atomicState.active_sch == 'cloudSch') scheduleMap = atomicState.cloudSchMap
                         
-            if (EP == 0 || atomicState.run_today) {
-            //else if (atomicState.run_today) scheduleid = scheduleMap['scheduleid']
+            if (EP == 0 || atomicState.run_today) {            
             	scheduleid = scheduleMap['scheduleid']
             	duration = scheduleMap['run_length']
-            }
-        
+            }        
         }
             
         if (zonestate == 0 && EP != 0) duration = 0
-        else if (!atomicState.run_today) duration = settings.switches.currentValue('minutes')[0].toInteger() * 60     
+        else if (!atomicState.run_today) duration = settings.switches.currentValue('valveDuration').toInteger() * 60     
         else if (EP != 0) duration = tempTimeMap[(EP+1).toString()].toInteger() * 60        
        
         log.debug "Zone ${EP} ${zonestate} for ${duration}"
@@ -610,7 +588,7 @@ def switchHandler(evt) {
                             duration: duration,
                             schedule_id: scheduleid
                         ]
-                    ]
+                    ]                    
         sendPost(POSTparams)
     }
     
@@ -657,12 +635,11 @@ def sendPost(POSTparams) {
 
 //***************** schedule run commands ******************************
 //schedule on
-def schOn(){	
+def schOn() {	
     log.debug "run today: ${atomicState.run_today}"
     def sch = atomicState.active_sch
-    if(atomicState.run_today){
-        //settings.switches.zon()
-        settings.switches.start()
+    if(atomicState.run_today) {
+        settings.switches.setControllerState('resume')
         
         def schedule_map        
         if (atomicState.scheduleMap[sch]) schedule_map = atomicState.scheduleMap[sch]
@@ -677,19 +654,17 @@ def schOn(){
         note("active", "${sch_name} ends at ${finishTime}", "d")
     }
     else {
-    	cycleOff()
-        //settings.switches.programOff()
-    	//note("skip", "Skip Schedule", "d")
+    	cycleOff()        
     }
 }
 
 //schedule finish/off notification
-def cycleOff(){
+def cycleOff() {
 	log.debug "schedule finished"
     def sch = atomicState.active_sch
     def schedule_map
     
-    if (atomicState.run_today){
+    if (atomicState.run_today) {
         if (atomicState.scheduleMap[sch]) schedule_map = atomicState.scheduleMap[sch]
         else if (sch == 'manual' && atomicState.manualMap) schedule_map = atomicState.manualMap
         else if (sch == 'cloudSch' && atomicState.cloudSchMap) schedule_map = atomicState.cloudSchMap
@@ -700,20 +675,20 @@ def cycleOff(){
         String finishTime = new Date(now().toLong()).format('EE @ h:mm a', location.timeZone)
         note('finished', "${sch_name} finished ${finishTime}", 'd')
     }
-    else settings.switches.programOff()
+    else settings.switches.off()
     
     atomicState.run_today = false
     atomicState.active_sch = "none"
     check_que()
 }
 
-def check_que(){    
+def check_que() {    
     def tempQue = atomicState.que
-    if(tempQue[0] != "none"){
+    if(tempQue[0] != "none") {
     	runIn(20, "${tempQue[0]}")
         tempQue[0] = "none"
     }
-    else if(tempQue[1] != "none"){
+    else if(tempQue[1] != "none") {
     	runIn(20, "${tempQue[1]}")
         tempQue[1] = "none"
     }    
@@ -722,14 +697,13 @@ def check_que(){
 }
 
 //retrieve current runlist
-def getTodaysTimes(sch){
+def getTodaysTimes(sch) {
     log.debug "get todays times for Check$sch"
     atomicState.run_today = false    
     
     def respMessage = ""
     def result = []
     def tempCloudSchMap = [:]
-    //atomicState.cloudSchMap = [:]
         
     def schedule_map
     def scheduleID
@@ -739,12 +713,12 @@ def getTodaysTimes(sch){
     else if (sch == 'manual' && atomicState.manualMap) schedule_map = atomicState.manualMap
     
     //create map for schedules sent directly from cloud
-    if (!schedule_map && sch != 'manual'){
+    if (!schedule_map && sch != 'manual') {
     	scheduleID = sch
         sch = 'cloudSch'
         schedule_map = tempCloudSchMap
         }
-    else if (!schedule_map && sch == 'manual'){
+    else if (!schedule_map && sch == 'manual') {
     	//no manual schedule set - exit
         result[0] = "skip"
         result[1] = 'No manual schedule set'
@@ -797,11 +771,10 @@ def getTodaysTimes(sch){
     	}
 	}
     catch (e) {        
-        log.debug "send DB error: $e"
-        //update = false
+        log.debug "send DB error: $e"        
         error = true
         
-        if (atomicState.retry == false){
+        if (atomicState.retry == false) {
     		atomicState.retry = true
         
     		if (sch == '1') runIn(300, Check1, [overwrite: false])
@@ -822,13 +795,13 @@ def getTodaysTimes(sch){
 
     //log.debug scheduleZone
     
-    if (error == false){
+    if (error == false) {
     	atomicState.retry = false
         
         respMessage += schedule_name
     	result[0] = weather_message
     
-        if (atomicState.run_today){
+        if (atomicState.run_today) {
     	result[0] = "active"
     	respMessage += " starts in 1 min\n "
         }
@@ -838,11 +811,11 @@ def getTodaysTimes(sch){
         }        
         
         //save schedule time & zone settings
-        if (sch == 'manual'){
+        if (sch == 'manual') {
         	atomicState.manualMap['run_list'] = scheduleZone
             atomicState.manualMap.put ('run_length', run_length)
             }
-        else if (sch == 'cloudSch'){
+        else if (sch == 'cloudSch') {
         	tempCloudSchMap = ['scheduleid' : scheduleID, 'run_list' : scheduleZone, 'name' : schedule_name, 'run_length' : run_length] 
         	}
         else {
@@ -850,7 +823,7 @@ def getTodaysTimes(sch){
             tempSchMap[sch]['start_time'] = scheduleTime
             
             //only update if run today
-            if (atomicState.run_today){
+            if (atomicState.run_today) {
             	tempSchMap[sch].put ('run_list', scheduleZone)
             	tempSchMap[sch].put ('run_length', run_length)                
 			}
@@ -865,7 +838,7 @@ def getTodaysTimes(sch){
             int mm = hms[1].toInteger()
             int ss = 0
 
-            if ( (hh*60 + mm) <= (whh * 60 + wmm) ){
+            if ( (hh*60 + mm) <= (whh * 60 + wmm) ) {
                 wtime = hh*60 + mm - 5
                 whh = wtime / 60
                 wmm = ((wtime / 60 * 100) - (whh * 100)) * 60 /100
@@ -889,7 +862,7 @@ def getTodaysTimes(sch){
 def zoneCycles(sch) {    
     int i = 0
     
-    if (atomicState.run_today){
+    if (atomicState.run_today) {
         def schedule_map
         def tempSchMap = atomicState.scheduleMap
         if (tempSchMap[sch]) schedule_map = tempSchMap[sch]
@@ -907,7 +880,7 @@ def zoneCycles(sch) {
         def tempTimeMap = [:]	//atomicState.timeMap = [:]
         def option = []
     //need to add additional settings? added above at scheduleZone = '10:1,'  
-        for(i = 0; i < 17; i++){    	
+        for(i = 0; i < 17; i++) {    	
             option = newMap[i].toString().split(':')
             if (i == 0) tempTimeMap."${i+1}" = option[0]
             else if (option[1] != "0") tempTimeMap."${i+1}" = (Math.round(option[0].toInteger() / option[1].toInteger())).toString()
@@ -927,18 +900,18 @@ def zoneCycles(sch) {
 }
 
 //send runlist times to spruce controller
-def sendTimeMap(){
+def sendTimeMap() {
 	def tempTimeMap = atomicState.timeMap
 	settings.switches.settingsMap(tempTimeMap, 4002)
     }
 
 //**************** scheduled times ********************
-def Check1(){
+def Check1() {
 	def tempQue = atomicState.que
-    if(atomicState.active_sch == "none"){								 
+    if(atomicState.active_sch == "none") {								 
         runIn(10, zoneCycles1)
         runIn(60, schOn)
-        settings.switches.programWait()
+        settings.switches.setControllerState('pause')
         def result = getTodaysTimes('1')
         def status = result[0]
         def message = result[1]
@@ -952,12 +925,12 @@ def Check1(){
 }
 def zoneCycles1() {zoneCycles('1')}
 
-def Check2(){
+def Check2() {
 	def tempQue = atomicState.que
-    if(atomicState.active_sch == "none"){									
+    if(atomicState.active_sch == "none") {									
         runIn(10, zoneCycles2)
         runIn(60, schOn)
-        settings.switches.programWait()
+        settings.switches.setControllerState('pause')
         def result = getTodaysTimes('2')
         def status = result[0]
         def message = result[1]
@@ -971,12 +944,12 @@ def Check2(){
 }
 def zoneCycles2() {zoneCycles('2')}
 
-def Check3(){
+def Check3() {
 	def tempQue = atomicState.que
-    if(atomicState.active_sch == "none"){									
+    if(atomicState.active_sch == "none") {									
         runIn(10, zoneCycles3)
         runIn(60, schOn)
-        settings.switches.programWait()
+        settings.switches.setControllerState('pause')
         def result = getTodaysTimes('3')
         def status = result[0]
         def message = result[1]
@@ -990,12 +963,12 @@ def Check3(){
 }
 def zoneCycles3() {zoneCycles('3')}
 
-def Check4(){
+def Check4() {
 	def tempQue = atomicState.que
-    if(atomicState.active_sch == "none"){
+    if(atomicState.active_sch == "none") {
         runIn(10, zoneCycles4)
         runIn(60, schOn)
-        settings.switches.programWait()
+        settings.switches.setControllerState('pause')
         def result = getTodaysTimes('4')
         def status = result[0]
         def message = result[1]
@@ -1009,12 +982,12 @@ def Check4(){
 }
 def zoneCycles4() {zoneCycles('4')}
 
-def Check5(){
+def Check5() {
 	def tempQue = atomicState.que
-    if(atomicState.active_sch == "none"){
+    if(atomicState.active_sch == "none") {
         runIn(10, zoneCycles5)
         runIn(60, schOn)
-        settings.switches.programWait()
+        settings.switches.setControllerState('pause')
         def result = getTodaysTimes('5')
         def status = result[0]
         def message = result[1]
@@ -1028,12 +1001,12 @@ def Check5(){
 }
 def zoneCycles5() {zoneCycles('5')}
 
-def Check6(){
+def Check6() {
 	def tempQue = atomicState.que
-    if(atomicState.active_sch == "none"){
+    if(atomicState.active_sch == "none") {
         runIn(10, zoneCycles6)
         runIn(60, schOn)
-        settings.switches.programWait()
+        settings.switches.setControllerState('pause')
         def result = getTodaysTimes('6')
         def status = result[0]
         def message = result[1]
@@ -1047,8 +1020,8 @@ def Check6(){
 }
 def zoneCycles6() {zoneCycles('6')}
 
-def manual_schedule(){
-	//if(atomicState.active_sch == "none"){
+def manual_schedule() {
+	//if(atomicState.active_sch == "none") {
         //log.debug "Manual Schedule starting"
         runIn(10, zoneCyclesM)
         runIn(60, schOn)
@@ -1057,7 +1030,7 @@ def manual_schedule(){
         def status = result[0]
         def message = result[1]
         note(status, message, "d")
-        settings.switches.programWait()
+        settings.switches.setControllerState('pause')
 
         log.debug "Starting Check M in 1 minute"
    /*}
@@ -1070,28 +1043,28 @@ def zoneCyclesC() {zoneCycles('cloudSch')}
 
 
 //************* notifications to device, pushed if requested ******************
-def note(status, message, type){
+def note(status, message, type) {
 	log.debug "${status}:  ${message}"
-    settings.switches.notify("${status}", "${message}")
+    settings.switches.setStatus("${message}")
     if(notify)
     {
-      if (notify.contains('Daily') && type == "d"){       
+      if (notify.contains('Daily') && type == "d") {       
         sendPush "${message}"
       }
-      if (notify.contains('Weather') && type == "f"){     
+      if (notify.contains('Weather') && type == "f") {     
         sendPush "${message}"
       }
-      if (notify.contains('Warnings') && type == "w"){     
+      if (notify.contains('Warnings') && type == "w") {     
         sendPush "${message}"
       }
-      if (notify.contains('Moisture') && type == "m"){        
+      if (notify.contains('Moisture') && type == "m") {        
         sendPush "${message}"
       }      
     }
 }
 
 //**************************** device commands **************************************
-def runZone(){
+def runZone() {
 	log.debug(params.command)
     // use the built-in request object to get the command parameter
     def command = params.command
@@ -1101,9 +1074,9 @@ def runZone(){
         case "zon":
             //set turn on time
             def runT = zoneonoff[2].toInteger() / 60
-    		settings.switches.manualTime(runT)
+    		settings.switches.setValveDuration(runT)
          	//pumpOn()
-            zoneOn(zoneonoff[1])            
+            zoneOn(zoneonoff[1], runT)            
             return [error: false, return_value: 1]
             //def response = 'callback({"error":false,"return_value":1})'
             //render contentType: "application/jsonp", data: response, status: 200
@@ -1126,7 +1099,7 @@ def runZone(){
 
             log.debug "$status, $message"
             note(status, message, "d")
-            settings.switches.programWait()
+            settings.switches.setControllerState('pause')
 
             log.debug "Starting Check cloudSch in 1 minute"
             return [error: false, return_value: 1]
@@ -1141,13 +1114,12 @@ def runZone(){
     }    
 }
 
-def zoneOn(zone){	
-	//settings.switches."z${zone}on"()
-    //log.debug settings.switches
-    settings.switches.zoneon("${settings.switches.deviceNetworkId}.${zone}")
+def zoneOn(zone, duration) {
+    int endpoint = zone.toInteger() + 1
+    settings.switches.zoneOn(endpoint, duration)
 }
 
-def zoneOff(zone){
-	//settings.switches."z${zone}off"()
-    settings.switches.zoneoff("${settings.switches.deviceNetworkId}.${zone}")
+def zoneOff(zone) {	
+    int endpoint = zone.toInteger() + 1
+    settings.switches.zoneOff(endpoint)
 }

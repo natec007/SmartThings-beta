@@ -11,6 +11,10 @@
  *  for the specific language governing permissions and limitations under the License.
  *
 
+ Version v3.6
+ * update setTouchButtonDuration to only apply when controller is switched off
+ * add external command settingsMap for use with user added Spruce Scheduler
+
  Version v3.5
  * update zigbee ONOFF cluster
  * update Health Check
@@ -56,7 +60,7 @@ import groovy.json.JsonOutput
 import physicalgraph.zigbee.zcl.DataType
 
 //dth version
-def getVERSION() {'v3.5 3-2021'}
+def getVERSION() {'v3.6 6-2021'}
 def getDEBUG() {false}
 def getHC_INTERVAL_MINS() {60}
 //zigbee cluster, attribute, identifiers
@@ -88,10 +92,12 @@ metadata {
 		attribute "rainSensor", "string"
 		attribute "valveDuration", "NUMBER"
 
+		command "parse"
 		command "setStatus"
 		command "setRainSensor"
 		command "setControllerState"
 		command "setValveDuration"
+        command "settingsMap"
 
 		//new release
 		fingerprint manufacturer: "PLAID SYSTEMS", model: "PS-SPRZ16-01", zigbeeNodeType: "ROUTER", deviceJoinName: "Spruce Irrigation Controller"
@@ -179,7 +185,7 @@ def parse(String description) {
 		def child = childDevices.find{it.deviceNetworkId == "${device.deviceNetworkId}:${endpoint}"}
 		if (child) child.sendEvent(name: "valve", value: onoff)
 
-		if (device.latestValue("controllerState") == "off") return setTouchButtonDuration()
+		return setTouchButtonDuration()
 		break
 	  case "rainsensor":
 		def rainSensor = (value == 1 ? "wet" : "dry")
@@ -317,7 +323,7 @@ def setTouchButtonDuration() {
 
 	def sendCmds = []
 	sendCmds.push(zigbee.writeAttribute(zigbee.ONOFF_CLUSTER, OFF_WAIT_TIME_ATTRIBUTE, DataType.UINT16, touchButtonDuration, [destEndpoint: 1]))
-	return sendCmds
+	if (device.latestValue("controllerState") == "off") return sendCmds
 }
 
 //controllerState
@@ -464,7 +470,7 @@ def startSchedule() {
 
 //write switch time settings map
 def settingsMap(WriteTimes, attrType) {
-
+	if (DEBUG) log.debug "settingsMap ${WriteTimes}, ${attrType}"
 	def runTime
 	def sendCmds = []
 	for (endpoint in 1..17) {

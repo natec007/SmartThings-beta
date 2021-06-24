@@ -1,6 +1,6 @@
 /**
- *  Spruce Web Connect
- *  v2.00 - 05/25/21 - update to work with 2021 Spruce device
+ *  Spruce Gen1 Connect
+ *  
  *
  *  Copyright 2021 Plaid Systems
  *
@@ -13,7 +13,15 @@
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  *
- */
+
+Version 
+ * v2.00 - 05/25/21 - update to work with 2021 Spruce device
+ * v2.1 - 06/15/21 - update switchHandler zonestate default to 0
+
+*/
+ 
+def getVERSION() {'v2.1 6-2021'}
+
 definition(
     name: "Spruce Gen1 Connect",
     namespace: "plaidsystems",
@@ -103,7 +111,10 @@ def pageDevices() {
             }      
             section {
                 href page: "pageUnsetKey", title:"Reset Login", description: "Tap to forget Spruce API key and re-start login. For troubleshooting only."
-            }          
+            }
+            section {
+            	href(title: 'Version', description: getVERSION())
+        	}
         }   
     }
 }
@@ -531,23 +542,27 @@ def switchHandler(evt) {
     def device = tempSwitchesMap["${evt.device}"]
     
     def EP = 0
-    def zonestate = 1
+    def zonestate = 0
     boolean post = true
     switch (evt.name) {
 	  case "switch":
-		if (evt.value.contains('off')) zonestate = 0
+		if (evt.value.contains('on')) zonestate = 1
 		break
      case "status":
-		if (evt.value.contains('open') || evt.value.contains('closed')) {
+		if (evt.value.contains('open')) zonestate = 1
+        //if (evt.value.contains('on') && !evt.value.contains('zone')) zonestate = 1
+        
+        if (evt.value.contains('open') || evt.value.contains('closed')) {
         	EP = evt.value.substring(4,7).toInteger()            
         }
-        if (evt.value.contains('closed')) zonestate = 0
-        if (evt.value.contains('off')) zonestate = 0
+        if (evt.value.contains('pause') || evt.value.contains('resumed')) {
+        	post = false
+        }
 		break
      case "rainSensor":
 		EP = 101
-        if (evt.value.contains('dry')) zonestate = 0
-        if (evt.value.contains('disabled')) zonestate = 0
+        if (evt.value.contains('wet')) zonestate = 1
+        if (evt.value.contains('enabled')) zonestate = 1
 		break
      default:
 	  	log.debug "${evt.name} not found"
@@ -573,7 +588,7 @@ def switchHandler(evt) {
         else if (!atomicState.run_today) duration = settings.switches.currentValue('valveDuration').toInteger() * 60     
         else if (EP != 0) duration = tempTimeMap[(EP+1).toString()].toInteger() * 60        
        
-        log.debug "Zone ${EP} ${zonestate} for ${duration}"
+        log.debug "${post ? 'Post' : 'No post'} Zone ${EP} ${zonestate} for ${duration}"
 
         def postTime = now() / 1000
 

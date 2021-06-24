@@ -1,5 +1,5 @@
 /**
- *  Copyright 2020 PlaidSystems
+ *  Copyright 2021 PlaidSystems
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -10,6 +10,10 @@
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  *
+
+Version v3.7
+ * update add zoneOn, zoneOff commands for external integration
+ * move zone status update to parse
 
  Version v3.6
  * update setTouchButtonDuration to only apply when controller is switched off
@@ -60,7 +64,7 @@ import groovy.json.JsonOutput
 import physicalgraph.zigbee.zcl.DataType
 
 //dth version
-def getVERSION() {'v3.6 6-2021'}
+def getVERSION() {'v3.7 6-2021'}
 def getDEBUG() {false}
 def getHC_INTERVAL_MINS() {60}
 //zigbee cluster, attribute, identifiers
@@ -92,12 +96,13 @@ metadata {
 		attribute "rainSensor", "string"
 		attribute "valveDuration", "NUMBER"
 
-		command "parse"
+		command "zoneOn"
+		command "zoneOff"
 		command "setStatus"
 		command "setRainSensor"
 		command "setControllerState"
 		command "setValveDuration"
-        command "settingsMap"
+		command "settingsMap"
 
 		//new release
 		fingerprint manufacturer: "PLAID SYSTEMS", model: "PS-SPRZ16-01", zigbeeNodeType: "ROUTER", deviceJoinName: "Spruce Irrigation Controller"
@@ -147,7 +152,8 @@ metadata {
 //----------------------zigbee parse-------------------------------//
 
 // Parse incoming device messages to generate events
-def parse(String description) {
+def parse(description) {
+	if (DEBUG) log.debug description
 	def result = []
 	def endpoint, value, command
 	def map = zigbee.parseDescriptionAsMap(description)
@@ -185,6 +191,7 @@ def parse(String description) {
 		def child = childDevices.find{it.deviceNetworkId == "${device.deviceNetworkId}:${endpoint}"}
 		if (child) child.sendEvent(name: "valve", value: onoff)
 
+		sendEvent(name: "status", value: "Zone ${endpoint-1} ${onoff}", descriptionText: "Zone ${endpoint-1} ${onoff}", displayed:true)
 		return setTouchButtonDuration()
 		break
 	  case "rainsensor":
@@ -409,7 +416,6 @@ def valveOn(valueMap) {
 	def endpoint = valueMap.dni.replaceFirst("${device.deviceNetworkId}:","").toInteger()
 	def duration = (device.latestValue("valveDuration").toInteger())
 
-	sendEvent(name: "status", value: "${valueMap.label} on for ${duration}min(s)", descriptionText: "Zone ${valueMap.label} on for ${duration}min(s)")
 	if (DEBUG) log.debug "state ${state.hasConfiguredHealthCheck} ${zigbee.ONOFF_CLUSTER}"
 	zoneOn(endpoint, duration)
 }
@@ -417,14 +423,12 @@ def valveOn(valueMap) {
 def valveOff(valueMap) {
 	def endpoint = valueMap.dni.replaceFirst("${device.deviceNetworkId}:","").toInteger()
 
-	sendEvent(name: "status", value: "${valueMap.label} turned off", descriptionText: "${valueMap.label} turned off")
-
 	zoneOff(endpoint)
 }
 
 def zoneOn(endpoint, duration) {
-	//send duration from slider
-	return zoneDuration(duration) + zigbee.command(zigbee.ONOFF_CLUSTER, 1, "", [destEndpoint: endpoint])
+	//send duration
+	return zoneDuration(duration.toInteger()) + zigbee.command(zigbee.ONOFF_CLUSTER, 1, "", [destEndpoint: endpoint])
 }
 
 def zoneOff(endpoint) {
